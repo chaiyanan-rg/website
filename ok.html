@@ -1,25 +1,26 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>ตรวจสอบสลิป Slip OK</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ตรวจสอบสลิป SlipOK</title>
   <style>
     body {
       font-family: 'Prompt', sans-serif;
-      background: #f4f4f4;
+      background: #f2f2f2;
       padding: 30px;
       text-align: center;
     }
+
     .upload-container {
-      background: #fff;
+      background: white;
       padding: 20px;
       border-radius: 12px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      width: 100%;
       max-width: 500px;
       margin: auto;
     }
+
     input, button {
       padding: 10px;
       margin: 10px 0;
@@ -27,6 +28,7 @@
       max-width: 400px;
       font-size: 16px;
     }
+
     button {
       background-color: #28a745;
       color: white;
@@ -34,9 +36,11 @@
       border-radius: 6px;
       cursor: pointer;
     }
+
     button:hover {
       background-color: #218838;
     }
+
     .result-container {
       margin-top: 30px;
       text-align: left;
@@ -44,6 +48,7 @@
       margin-left: auto;
       margin-right: auto;
     }
+
     .card {
       background: white;
       padding: 20px;
@@ -51,33 +56,37 @@
       border-radius: 10px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     }
+
     .card h4 {
       margin: 0;
       color: #007bff;
     }
+
     .card p {
       margin: 5px 0;
     }
+
     .error {
       color: red;
       font-weight: bold;
     }
+
     img.slip-preview {
       max-width: 100%;
       margin-top: 20px;
       border-radius: 10px;
-      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
     }
   </style>
 </head>
 <body>
 
-  <h2>อัพโหลดสลิปเพื่อทำการตรวจสอบ</h2>
+  <h2>อัปโหลดสลิปเพื่อทำการตรวจสอบ</h2>
   <div class="upload-container">
     <form id="uploadForm" enctype="multipart/form-data">
       <input type="file" name="slip" accept=".jpg,.jpeg,.png,.jfif,.webp" required><br>
       <input type="number" name="amount" placeholder="ระบุจำนวนเงิน (บาท)" step="0.01"><br>
-      <button type="submit">อัพโหลดและตรวจสอบ</button>
+      <button type="submit">อัปโหลดและตรวจสอบ</button>
     </form>
     <div id="message"></div>
   </div>
@@ -95,16 +104,16 @@
       const messageElement = document.getElementById('message');
 
       if (!file) {
-        messageElement.innerHTML = `<p class="error">กรุณาเลือกไฟล์สลิป</p>`;
+        messageElement.innerHTML = `<p class="error">⚠️ กรุณาเลือกไฟล์สลิป</p>`;
         return;
       }
 
-      messageElement.textContent = "⏳ กำลังอัพโหลดและตรวจสอบ...";
+      messageElement.textContent = "⏳ กำลังอัปโหลดและตรวจสอบ...";
       resultContainer.innerHTML = "";
 
       const formData = new FormData();
       formData.append("files", file);
-      formData.append("log", "true"); // เช็คธนาคารที่ผูกไว้ใน LIFF
+      formData.append("log", "true");
       if (amount) formData.append("amount", amount);
 
       try {
@@ -138,7 +147,14 @@
             ${slip.image ? `<img src="${slip.image}" class="slip-preview" alt="ภาพสลิป">` : ''}
           `;
         } else {
-          messageElement.innerHTML = `<p class="error">❌ ตรวจสอบไม่สำเร็จ: ${data.message || 'เกิดข้อผิดพลาด'}</p>`;
+          // ❌ แสดงรหัส error และข้อความจาก API
+          messageElement.innerHTML = `
+            <div class="card">
+              <h4 class="error">❌ ตรวจสอบไม่สำเร็จ</h4>
+              <p><strong>รหัสข้อผิดพลาด (Code):</strong> ${data.code || 'ไม่มี'}</p>
+              <p><strong>ข้อความจากระบบ:</strong> ${data.message || 'ไม่สามารถตรวจสอบได้'}</p>
+            </div>
+          `;
         }
       } catch (error) {
         console.error("Error:", error);
